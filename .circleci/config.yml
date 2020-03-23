@@ -31,7 +31,7 @@ jobs:
       - install_deps
       - store_artifacts:
           path: ./
-  intergration-tests:
+  integration-tests:
     docker:
       - image: circleci/node:lts
       - image: mongo:4.0
