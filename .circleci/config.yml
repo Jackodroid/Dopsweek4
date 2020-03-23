@@ -37,6 +37,18 @@ jobs:
       - image: mongo:4.0
     environment:
       APP_PORT: 4000
+      JEST_JUNIT_OUTPUT_DIR: test-output
+    steps:
+      - checkout
+      - install_deps
+      - run:
+          name: Run integration tests
+          command: |
+            mkdir -p test-output
+            npm run integration-tests
+
+      - store_test_results:
+          path: test-output
   sast:
     docker:
       - image: circleci/node:lts
@@ -51,7 +63,13 @@ jobs:
       - run: 
           name: Run NodeJsScan
           command: |
-            nodejsscan -d ./
+            nodejsscan -d ./ -o sast-output.json
+      - run:
+          name: Parse sast report
+          command: |
+            # exit with a non-zero exit coe if there are any security issues exit $(cat sast-output.json | jq.total_count.sec)
+      - store_test_results:
+          path: sast-output.json
 
 workflows:
   build-and-packge:
